@@ -3,7 +3,11 @@ import { RootState, AppThunk } from "../../app/store";
 import axios from "axios";
 // import { fetchCount } from './counterAPI';
 
+//Get user from sessionStorage
+let user = sessionStorage.getItem("user");
+
 export interface AuthState {
+  user: string | null;
   message: string;
   //   status: "idle" | "loading" | "failed";
   isError: boolean;
@@ -11,14 +15,20 @@ export interface AuthState {
   isSuccess: boolean;
 }
 
-export interface AuthObject {
+export interface Signup {
   firstName: String;
   lastName: String;
   email: String;
   password: String;
 }
 
+export interface Signin {
+  email: String;
+  password: String;
+}
+
 const initialState: AuthState = {
+  user: user ? user : null,
   message: "",
   isError: false,
   isLoading: false,
@@ -32,14 +42,14 @@ const initialState: AuthState = {
 // typically used to make async requests.
 export const testLogin = createAsyncThunk("auth/testLogin", async () => {
   // const response = await fetchCount(amount);
-  const response = await axios.get("http://localhost:3001/api/auth/logout");
+  const response = await axios.get("http://localhost:3001/api/test/");
   // The value we return becomes the `fulfilled` action payload
   return response.data;
 });
 
 export const Signup = createAsyncThunk(
   "auth/Signup",
-  async (authobject: AuthObject) => {
+  async (authobject: Signup) => {
     // const response = await fetchCount(amount);
     console.log("started");
     const response = await axios.post(
@@ -50,7 +60,7 @@ export const Signup = createAsyncThunk(
         email: authobject.email,
         password: authobject.password,
       },
-      { withCredentials: true, baseURL: "http://localhost:3001/" }
+      { withCredentials: true, baseURL: "http://localhost:3001" }
     );
     console.log(response);
     console.log("finished");
@@ -58,6 +68,53 @@ export const Signup = createAsyncThunk(
     return response.data;
   }
 );
+
+export const Signin = createAsyncThunk(
+  "auth/Signin",
+  async (authobject: Signin) => {
+    console.log("started");
+
+    const response = await axios.post(
+      "/api/auth/signin",
+      {
+        email: authobject.email,
+        password: authobject.password,
+      },
+      { withCredentials: true, baseURL: "http://localhost:3001" }
+    );
+
+    if (response.data) {
+      console.log("response data");
+      console.log(response.data);
+      let token = response.data.RefreshToken
+        ? response.data.RefreshToken
+        : null;
+      if (token) {
+        sessionStorage.setItem("user", JSON.stringify(token.replace('"', "")));
+      }
+    }
+
+    console.log(response);
+    console.log("finished");
+
+    return response.data;
+  }
+);
+
+export const Signout = createAsyncThunk("auth/Signout", async () => {
+  console.log("started");
+
+  const response = await axios.get("/api/auth/signout", {
+    withCredentials: true,
+    baseURL: "http://localhost:3001",
+  });
+
+  console.log(response);
+  sessionStorage.clear();
+  console.log("finished");
+
+  return response.data;
+});
 
 export const authSlice = createSlice({
   name: "auth",
@@ -116,6 +173,7 @@ export const { reset } = authSlice.actions;
 // in the slice file. For example: `useSelector((state: RootState) => state.counter.value)`
 
 export const statusMessage = (state: RootState) => state.auth.message;
+export const currentuser = (state: RootState) => state.auth.user;
 
 // We can also write thunks by hand, which may contain both sync and async logic.
 // Here's an example of conditionally dispatching actions based on current state.

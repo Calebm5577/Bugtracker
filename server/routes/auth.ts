@@ -1,9 +1,9 @@
 // import { Request, Response, NextFunction } from "express";
 const express = require("express");
 const router = express.Router();
-const { signin, signup, logout } = require("../controllers/auth");
+const { signin, signup, signout } = require("../controllers/auth");
 
-router.get("/signin", signin);
+router.post("/signin", signin);
 router.post("/signup", signup);
-router.get("/logout", logout);
+router.get("/signout", signout);
 module.exports = router;
