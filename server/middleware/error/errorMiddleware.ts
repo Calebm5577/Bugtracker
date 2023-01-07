@@ -8,7 +8,7 @@ const errorHandler = (
 ) => {
   const statusCode = res.statusCode ? res.statusCode : 500;
   console.log("inside errorMiddleware");
-  res.status(statusCode).json({ message: err.message, stack: err.stack });
+  res.status(500).json({ message: err.message, stack: err.stack });
   console.log(err.message);
   // res.json({
   //   message: err.message,

@@ -32,7 +32,7 @@ function App() {
   const value = useAppSelector(selectValue);
   const status2 = useAppSelector(statusMessage);
   const user = useAppSelector(currentuser);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   return (
     <>
@@ -69,7 +69,7 @@ function App() {
 }
 
 function RequireAuth({ children }: { children: JSX.Element }) {
-  let location = useLocation();
+  // let location = useLocation();
   const user = useAppSelector(currentuser);
 
   if (!user) {
@@ -79,7 +79,8 @@ function RequireAuth({ children }: { children: JSX.Element }) {
     // than dropping them off on the home page.
     return (
       <>
-        <Navigate to="/login" state={{ from: location }} replace />;
+        {/* <Navigate to="/login" state={{ from: location }} replace />; */}
+        <Navigate to="/login" />;
       </>
     );
   }
@@ -88,7 +89,7 @@ function RequireAuth({ children }: { children: JSX.Element }) {
 }
 
 function RequireNoAuth({ children }: { children: JSX.Element }) {
-  let location = useLocation();
+  // let location = useLocation();
   const user = useAppSelector(currentuser);
 
   if (user) {
@@ -98,7 +99,7 @@ function RequireNoAuth({ children }: { children: JSX.Element }) {
     // than dropping them off on the home page.
     return (
       <>
-        <Navigate to="/dashboard" state={{ from: location }} replace />;
+        <Navigate to="/dashboard" />;
       </>
     );
   }

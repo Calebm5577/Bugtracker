@@ -47,6 +47,7 @@ const signin = asyncHandler(async (req: Request, res: Response) => {
       throw new Error("something went wrong");
     }
   }
+  throw new Error("user does not exist");
   // res.send("Hello World!");
 });
 

@@ -153,12 +153,30 @@ export const authSlice = createSlice({
         state.isError = false;
         state.isSuccess = false;
       })
-      .addCase(Signup.fulfilled, (state) => {
+      .addCase(Signup.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isError = false;
         state.isSuccess = true;
       })
       .addCase(Signup.rejected, (state) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.isSuccess = false;
+      })
+      .addCase(Signin.pending, (state) => {
+        state.isLoading = true;
+        state.isError = false;
+        state.isSuccess = false;
+      })
+      .addCase(Signin.fulfilled, (state, action) => {
+        console.log("Finished inside addcase");
+        console.log(action);
+        state.user = action.payload.RefreshToken;
+        state.isLoading = false;
+        state.isError = false;
+        state.isSuccess = true;
+      })
+      .addCase(Signin.rejected, (state) => {
         state.isLoading = false;
         state.isError = true;
         state.isSuccess = false;
@@ -174,6 +192,8 @@ export const { reset } = authSlice.actions;
 
 export const statusMessage = (state: RootState) => state.auth.message;
 export const currentuser = (state: RootState) => state.auth.user;
+export const loading = (state: RootState) => state.auth.isLoading;
+export const error = (state: RootState) => state.auth.isError;
 
 // We can also write thunks by hand, which may contain both sync and async logic.
 // Here's an example of conditionally dispatching actions based on current state.

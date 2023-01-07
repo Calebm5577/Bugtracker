@@ -11,11 +11,11 @@ import { useNavigate, redirect, useLocation } from "react-router-dom";
 
 export const Header = () => {
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const SignoutFunc = () => {
     dispatch(Signout());
-    navigate("/login");
+    // navigate("/login");
     console.log("made it ");
   };
   return (

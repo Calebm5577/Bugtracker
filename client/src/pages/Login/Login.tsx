@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, EffectCallback, ReactElement } from "react";
 import { useAppSelector, useAppDispatch } from "../../app/hooks";
 import {
   statusMessage,
@@ -6,6 +6,8 @@ import {
   Signup,
   Signin,
   Signout,
+  loading,
+  error,
 } from "../../features/Auth/authSlice";
 import {
   goodbye,
@@ -21,6 +23,8 @@ export const Login = (props: Props) => {
   const dispatch = useAppDispatch();
   const value = useAppSelector(selectValue);
   const status2 = useAppSelector(statusMessage);
+  const pending = useAppSelector(loading);
+  const errored = useAppSelector(error);
 
   //login user state
   const [auth, setAuth] = useState({
@@ -58,6 +62,20 @@ export const Login = (props: Props) => {
       };
     });
   };
+  //useEffect
+  // useEffect(()  => {
+  //   if (pending) {
+  //     return (
+  //       // <div>
+  //       //   ...Loading
+  //       // </div>
+  //       console.log()
+  //     )
+  //   }
+  // }, [pending]);
+
+  //can save
+  //   const canSave = [title, content, userId].every(Boolean) && addRequestStatus === 'idle'
 
   //dispatches then redirects to login
   const SignoutFunc = () => {
@@ -65,16 +83,46 @@ export const Login = (props: Props) => {
     return navigate("/login");
   };
 
-  const SignupFunc = () => {
-    dispatch(Signin({ ...auth2 }));
-    navigate("/dashboard");
+  const SigninFunc = async () => {
+    try {
+      await dispatch(Signin({ ...auth2 })).unwrap();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      console.log("we made it");
+      // set requestStatus('idle')
+      navigate("/dashboard");
+    }
   };
+
+  //.unwrap() =
+  // .unwrap() function to the returned Promise, which will return a new Promise
+  // that either has the actual action.payload value from a fulfilled action,
+  // or throws an error if it's the rejected action. This lets us handle success and
+  // failure in the component using normal try/catch logic. So, we'll clear out the
+  // input fields to reset the form if the post was successfully created, and log
+  // the error to the console if it failed.
+
+  // const SigninFunc = () => {
+  //   dispatch(Signin({ ...auth2 }))
+  //     .unwrap()
+  //     .then(() => navigate("/dashboard"))
+  //     .catch((error) => "handle error");
+  // };
 
   // if (user) return (
   //   <>
   //     <Navigate to="/dashboard"
   //   </>
   // )
+
+  if (pending) {
+    return <div>...Loading</div>;
+  }
+
+  if (errored) {
+    alert("something went wrong");
+  }
 
   return (
     <div>
@@ -154,7 +202,13 @@ export const Login = (props: Props) => {
           <input
             type="submit"
             style={{ maxWidth: "100px" }}
-            onClick={() => SignupFunc()}
+            onClick={() => SigninFunc()}
+          />
+
+          <input
+            type="submit"
+            style={{ maxWidth: "100px" }}
+            onClick={() => navigate("/dashboard")}
           />
 
           {/* Sign out */}
