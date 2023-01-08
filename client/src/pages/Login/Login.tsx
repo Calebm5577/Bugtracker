@@ -4,7 +4,7 @@ import {
   statusMessage,
   testLogin,
   Signup,
-  Signin,
+  // Signin,
   Signout,
   loading,
   error,
@@ -14,7 +14,8 @@ import {
   selectValue,
 } from "../../features/changetext/ChangetextSlice";
 import React, { ChangeEvent } from "react";
-import { useNavigate, redirect, useLocation } from "react-router-dom";
+import { useNavigate, redirect, useLocation, Navigate } from "react-router-dom";
+import { useSignInMutation } from "../../features/api/apiSlice";
 
 type Props = {};
 
@@ -25,6 +26,9 @@ export const Login = (props: Props) => {
   const status2 = useAppSelector(statusMessage);
   const pending = useAppSelector(loading);
   const errored = useAppSelector(error);
+
+  //mutations
+  const [thisIsSignIn, { isLoading, isSuccess, data }] = useSignInMutation();
 
   //login user state
   const [auth, setAuth] = useState({
@@ -62,17 +66,6 @@ export const Login = (props: Props) => {
       };
     });
   };
-  //useEffect
-  // useEffect(()  => {
-  //   if (pending) {
-  //     return (
-  //       // <div>
-  //       //   ...Loading
-  //       // </div>
-  //       console.log()
-  //     )
-  //   }
-  // }, [pending]);
 
   //can save
   //   const canSave = [title, content, userId].every(Boolean) && addRequestStatus === 'idle'
@@ -85,13 +78,16 @@ export const Login = (props: Props) => {
 
   const SigninFunc = async () => {
     try {
-      await dispatch(Signin({ ...auth2 })).unwrap();
+      // await dispatch(Signin({ ...auth2 })).unwrap();
+      await thisIsSignIn({ ...auth2 }).unwrap();
     } catch (error) {
       console.log(error);
     } finally {
+      console.log(`data ${data}`);
       console.log("we made it");
       // set requestStatus('idle')
-      navigate("/dashboard");
+      console.log(isSuccess);
+      // navigate("/dashboard");
     }
   };
 
@@ -116,8 +112,14 @@ export const Login = (props: Props) => {
   //     <Navigate to="/dashboard"
   //   </>
   // )
-
-  if (pending) {
+  if (data) {
+    console.log("yay data");
+    console.log(data);
+    // navigate("/dashboard");
+    // return <Navigate to="/dashboard" />;
+  }
+  if (isLoading) {
+    console.log("isLoading");
     return <div>...Loading</div>;
   }
 

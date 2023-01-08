@@ -16,6 +16,12 @@ interface id {
 }
 
 const signin = asyncHandler(async (req: Request, res: Response) => {
+  console.log("start");
+  console.log(req.body);
+  if (!req.body.email || !req.body.password) {
+    throw new Error("Use all feilds");
+  }
+
   let checkuser = await User.findOne({ email: req.body.email });
 
   if (checkuser) {
@@ -26,8 +32,10 @@ const signin = asyncHandler(async (req: Request, res: Response) => {
         req.body.password,
         checkuser.password
       );
+      console.log("made it past let checkpassword");
 
       if (checkPassword) {
+        console.log("made it inside checkpassword");
         let AccessToken = generateAccessToken(checkPassword._id);
         let RefreshToken = generateRefreshToken(checkPassword._id);
 
@@ -36,9 +44,11 @@ const signin = asyncHandler(async (req: Request, res: Response) => {
           sameSite: "lax",
           expires: new Date(Date.now() + 1 * 60 * 60 * 1000),
         });
+        console.log("made it passed res.cookie");
 
         res.status(200).json({ message: "success", RefreshToken });
       } else {
+        res.status(400);
         throw new Error("something went wrong 2");
       }
     } catch (e) {
@@ -46,8 +56,11 @@ const signin = asyncHandler(async (req: Request, res: Response) => {
       console.log(e);
       throw new Error("something went wrong");
     }
+  } else {
+    res.status(400);
+    throw new Error("user does not exist");
   }
-  throw new Error("user does not exist");
+
   // res.send("Hello World!");
 });
 

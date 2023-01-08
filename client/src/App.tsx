@@ -70,7 +70,7 @@ function App() {
 
 function RequireAuth({ children }: { children: JSX.Element }) {
   // let location = useLocation();
-  const user = useAppSelector(currentuser);
+  const user = sessionStorage.getItem("user");
 
   if (!user) {
     // Redirect them to the /login page, but save the current location they were
