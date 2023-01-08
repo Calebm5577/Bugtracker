@@ -95,13 +95,14 @@ export const Login = (props: Props) => {
     }
   };
 
-  //.unwrap() =
+  //.unwrap() explained:
   // .unwrap() function to the returned Promise, which will return a new Promise
   // that either has the actual action.payload value from a fulfilled action,
   // or throws an error if it's the rejected action. This lets us handle success and
   // failure in the component using normal try/catch logic. So, we'll clear out the
   // input fields to reset the form if the post was successfully created, and log
   // the error to the console if it failed.
+  // https://redux.js.org/tutorials/essentials/part-5-async-logic
 
   // const SigninFunc = () => {
   //   dispatch(Signin({ ...auth2 }))
