@@ -94,7 +94,9 @@ const signup = asyncHandler(
 
           console.log("after cookie");
           console.log(newUser);
-          res.status(200).json({ ...newUser, token: RefreshToken });
+          res
+            .status(200)
+            .json({ message: "account created successfully", RefreshToken });
         }
       } catch (e) {
         res.status(400).json({ message: "something went wrong" });
@@ -117,6 +119,79 @@ const signout = async (req: Request, res: Response) => {
   res.status(200).json({ message: "success" });
 };
 
+// const verify = asyncHandler(async (req: Request, res: Response) => {
+//   ///doing token stufff
+//   console.log(req.header);
+//   console.log(req.headers);
+//   const authHeader = String(req.headers["authorization"] || "");
+//   console.log(authHeader);
+//   if (authHeader.startsWith("Bearer ")) {
+//     const token = authHeader
+//       .substring(7, authHeader.length)
+//       .replace(/['"]+/g, ""); // removes quotes, may already be removed on client, does no harm if so
+//     console.log(`token ${token}`);
+
+//     if (token) {
+//       const decoded = jwt.verify(token, process.env.REFRESH_JWT_SECRET);
+//       console.log(decoded);
+//       console.log(decoded);
+//       res.status(200).json({ message: "success" });
+//     } else {
+// res.cookie("auth-token", "", {
+//   httpOnly: false,
+//   sameSite: "lax",
+//   expires: new Date(Date.now() - 1000),
+// });
+//       res.status(400);
+//       throw new Error("no token inside bearer");
+//     }
+//   } else {
+//     res.cookie("auth-token", "", {
+//       httpOnly: false,
+//       sameSite: "lax",
+//       expires: new Date(Date.now() - 1000),
+//     });
+//     res.status(400);
+//     throw new Error("no bearer token");
+//   }
+// });
+
+const verify = asyncHandler(async (req: Request, res: Response) => {
+  ///doing token stufff
+  if (req.headers.cookie) {
+    console.log(req.headers.cookie.split("=")[1]);
+    let token = req.headers.cookie.split("=")[1];
+    try {
+      console.log("inside try");
+      const decoded = jwt.verify(token, process.env.ACCESS_JWT_SECRET);
+      console.log(decoded);
+      console.log("after decoded");
+      res.status(200).json({
+        message: "success",
+        RefreshToken: req.headers.cookie.split("=")[1],
+      });
+    } catch (e) {
+      console.log("inside error");
+      console.log(e);
+      res.cookie("auth-token", "", {
+        httpOnly: false,
+        sameSite: "lax",
+        expires: new Date(Date.now() - 1000),
+      });
+      res.status(400);
+      throw new Error(`error: ${e}`);
+    }
+  } else {
+    res.cookie("auth-token", "", {
+      httpOnly: false,
+      sameSite: "lax",
+      expires: new Date(Date.now() - 1000),
+    });
+    res.status(400);
+    throw new Error(`no token`);
+  }
+});
+
 const generateRefreshToken = (id: id) => {
   return jwt.sign({ id }, process.env.REFRESH_JWT_SECRET, {
     expiresIn: "30m",
@@ -129,4 +204,4 @@ const generateAccessToken = (id: id) => {
   });
 };
 
-module.exports = { signin, signup, signout };
+module.exports = { signin, signup, signout, verify };

@@ -3,11 +3,12 @@ import { useAppSelector, useAppDispatch } from "../../app/hooks";
 import {
   statusMessage,
   testLogin,
-  Signup,
+  // Signup,
   // Signin,
-  Signout,
+  // Signout,
   loading,
   error,
+  updateUser,
 } from "../../features/Auth/authSlice";
 import {
   goodbye,
@@ -15,7 +16,12 @@ import {
 } from "../../features/changetext/ChangetextSlice";
 import React, { ChangeEvent } from "react";
 import { useNavigate, redirect, useLocation, Navigate } from "react-router-dom";
-import { useSignInMutation } from "../../features/api/apiSlice";
+//import from extended auth endpoint
+import {
+  useSignInMutation,
+  useSignUpMutation,
+  useVerifyQuery,
+} from "../../features/api/endpoints/authEndpoints";
 
 type Props = {};
 
@@ -25,11 +31,25 @@ export const Login = (props: Props) => {
   const value = useAppSelector(selectValue);
   const status2 = useAppSelector(statusMessage);
   const pending = useAppSelector(loading);
-  const errored = useAppSelector(error);
+  // const errored = useAppSelector(error);
 
   //mutations
-  const [thisIsSignIn, { isLoading, isSuccess, data }] = useSignInMutation();
+  const [thisIsSignIn, { isLoading, isSuccess, data, isError, error }] =
+    useSignInMutation();
+  // const [thisIsSignIn] = useSignInMutation();
 
+  const [
+    thisIsSignUp,
+    {
+      isLoading: signupLoading,
+      isSuccess: signupSucces,
+      data: signupData,
+      isError: signupIsError,
+      error: signupError,
+    },
+  ] = useSignUpMutation();
+
+  /// LOCAL STATE ////
   //login user state
   const [auth, setAuth] = useState({
     firstName: "",
@@ -42,6 +62,8 @@ export const Login = (props: Props) => {
     email: "",
     password: "",
   });
+
+  const [isRegister, setIsRegister] = useState(false);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     let value = event.target.value;
@@ -71,23 +93,45 @@ export const Login = (props: Props) => {
   //   const canSave = [title, content, userId].every(Boolean) && addRequestStatus === 'idle'
 
   //dispatches then redirects to login
-  const SignoutFunc = () => {
-    dispatch(Signout());
-    return navigate("/login");
-  };
+  // const SignoutFunc = () => {
+  //   dispatch(Signout());
+  //   return navigate("/login");
+  // };
 
   const SigninFunc = async () => {
     try {
       // await dispatch(Signin({ ...auth2 })).unwrap();
-      await thisIsSignIn({ ...auth2 }).unwrap();
+      let signin = await thisIsSignIn({ ...auth2 }).unwrap();
+      console.log("about to update user");
+      dispatch(updateUser(signin));
+      console.log("after update user");
     } catch (error) {
       console.log(error);
     } finally {
       console.log(`data ${data}`);
-      console.log("we made it");
+      console.log("we made it in signin func");
       // set requestStatus('idle')
       console.log(isSuccess);
-      // navigate("/dashboard");
+      navigate("/dashboard");
+    }
+  };
+
+  const SignupFunc = async () => {
+    try {
+      // await dispatch(Signin({ ...auth2 })).unwrap();
+      let signup = await thisIsSignUp({ ...auth }).unwrap();
+
+      dispatch(updateUser(signup));
+    } catch (error) {
+      console.log("signup error");
+      console.log(error);
+    } finally {
+      console.log(`data ${data}`);
+      console.log("we made it in signup func");
+      // set requestStatus('idle')
+      console.log(isSuccess);
+      console.log("gonna navigate to dashboard now");
+      navigate("/dashboard");
     }
   };
 
@@ -112,113 +156,142 @@ export const Login = (props: Props) => {
   //     <Navigate to="/dashboard"
   //   </>
   // )
-  if (data) {
+  if (data || signupData) {
     console.log("yay data");
-    console.log(data);
+    console.log(data || signupData);
     // navigate("/dashboard");
     // return <Navigate to="/dashboard" />;
   }
-  if (isLoading) {
+  if (isLoading || signupLoading) {
     console.log("isLoading");
     return <div>...Loading</div>;
   }
 
-  if (errored) {
+  if (error || signupError) {
     alert("something went wrong");
+  }
+
+  if (isRegister) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "100vh",
+          fontSize: "calc(10px + 2vmin)",
+        }}
+      >
+        {/* Sign up */}
+
+        <h1>signup form</h1>
+
+        <label>
+          {" "}
+          Enter your firstName:
+          <input
+            type="text"
+            onChange={handleChange}
+            name="firstName"
+            value={auth.firstName}
+          />
+        </label>
+        <label>
+          {" "}
+          Enter your lastName:
+          <input
+            type="text"
+            onChange={handleChange}
+            name="lastName"
+            value={auth.lastName}
+          />
+        </label>
+        <label>
+          {" "}
+          Enter your email:
+          <input
+            type="text"
+            onChange={handleChange}
+            name="email"
+            value={auth.email}
+          />
+        </label>
+        <label>
+          {" "}
+          Enter your password:
+          <input
+            type="password"
+            onChange={handleChange}
+            name="password"
+            value={auth.password}
+          />
+        </label>
+        <input
+          type="submit"
+          style={{ maxWidth: "100px" }}
+          // onClick={() => dispatch(Signup({ ...auth }))}
+          onClick={() => SignupFunc()}
+        />
+        <p>
+          Already signed up? click
+          <button onClick={() => setIsRegister(false)}>here</button> to sign in
+        </p>
+      </div>
+    );
   }
 
   return (
     <div>
-      <h1>Login Page</h1>
-      <div>
-        <header className="App-header">
-          <h1>Test login</h1>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "100vh",
+          fontSize: "calc(10px + 2vmin)",
+        }}
+      >
+        <h1>signin form</h1>
 
-          {/* Test Login */}
-          <button onClick={() => dispatch(testLogin())}>test</button>
-          <h1>{status2}</h1>
+        {/* Test Login */}
+        {/* <button onClick={() => dispatch(testLogin())}>test</button>
+        <h1>{status2}</h1> */}
 
-          {/* Sign up */}
+        {/* Sign in */}
+        <input
+          placeholder="email"
+          onChange={handleChange2}
+          name="email"
+          value={auth2.email}
+        />
+        <input
+          placeholder="password"
+          onChange={handleChange2}
+          name="password"
+          value={auth2.password}
+        />
+        <input
+          type="submit"
+          style={{ maxWidth: "100px" }}
+          onClick={() => SigninFunc()}
+        />
 
-          <h1>signup form</h1>
+        {/* <input
+          type="submit"
+          style={{ maxWidth: "100px" }}
+          onClick={() => navigate("/dashboard")}
+        /> */}
 
-          <label>
-            {" "}
-            Enter your firstName:
-            <input
-              type="text"
-              onChange={handleChange}
-              name="firstName"
-              value={auth.firstName}
-            />
-          </label>
-          <label>
-            {" "}
-            Enter your lastName:
-            <input
-              type="text"
-              onChange={handleChange}
-              name="lastName"
-              value={auth.lastName}
-            />
-          </label>
-          <label>
-            {" "}
-            Enter your email:
-            <input
-              type="text"
-              onChange={handleChange}
-              name="email"
-              value={auth.email}
-            />
-          </label>
-          <label>
-            {" "}
-            Enter your password:
-            <input
-              type="password"
-              onChange={handleChange}
-              name="password"
-              value={auth.password}
-            />
-          </label>
-          <input
-            type="submit"
-            style={{ maxWidth: "100px" }}
-            onClick={() => dispatch(Signup({ ...auth }))}
-          />
+        <p>
+          Don't have an account? click
+          <button onClick={() => setIsRegister(true)}> here</button> to sign up
+        </p>
+        {/* Sign out */}
 
-          {/* Sign in */}
-
-          <input
-            placeholder="email"
-            onChange={handleChange2}
-            name="email"
-            value={auth2.email}
-          />
-          <input
-            placeholder="password"
-            onChange={handleChange2}
-            name="password"
-            value={auth2.password}
-          />
-          <input
-            type="submit"
-            style={{ maxWidth: "100px" }}
-            onClick={() => SigninFunc()}
-          />
-
-          <input
-            type="submit"
-            style={{ maxWidth: "100px" }}
-            onClick={() => navigate("/dashboard")}
-          />
-
-          {/* Sign out */}
-
-          <h1>Signout</h1>
-          <button onClick={SignoutFunc}>Signout</button>
-        </header>
+        {/* <h1>Signout</h1> */}
+        {/* <button onClick={SignoutFunc}>Signout</button> */}
       </div>
     </div>
   );

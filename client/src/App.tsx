@@ -2,7 +2,11 @@ import React from "react";
 import logo from "./logo.svg";
 import { Counter } from "./features/counter/Counter";
 import { selectValue } from "./features/changetext/ChangetextSlice";
-import { statusMessage, currentuser } from "./features/Auth/authSlice";
+import {
+  statusMessage,
+  currentuser,
+  updateUser,
+} from "./features/Auth/authSlice";
 import "./App.css";
 import { useAppSelector, useAppDispatch } from "./app/hooks";
 import {
@@ -25,6 +29,7 @@ import { FileWatcherEventKind } from "typescript";
 import { Login } from "./pages/Login/Login";
 import { Dashboard } from "./pages/Dashboard/Dashboard";
 import { Header } from "./components/Header";
+import { useVerifyQuery } from "./features/api/endpoints/authEndpoints";
 
 function App() {
   // hello value from state
@@ -55,12 +60,6 @@ function App() {
                 <Dashboard />
               </RequireAuth>
             }
-            // loader={async () => {
-            //   if (!user) {
-            //     throw redirect("/login");
-            //   }
-            //   return { user };
-            // }}
           />
         </Routes>
       </Router>
@@ -70,9 +69,27 @@ function App() {
 
 function RequireAuth({ children }: { children: JSX.Element }) {
   // let location = useLocation();
-  const user = sessionStorage.getItem("user");
 
-  if (!user) {
+  // const user = useAppSelector(currentuser);
+  const dispatch = useAppDispatch();
+  console.log("this is user in require auth");
+  const { isError, isLoading, data, error, isSuccess } = useVerifyQuery({
+    arguments: "",
+  });
+
+  if (isLoading) {
+    return <div>...Loading</div>;
+  }
+
+  if (data) {
+    console.log(data);
+    dispatch(updateUser(data));
+  }
+
+  if (error) {
+    console.log("isError happened");
+    console.log(isError);
+    console.log(error);
     // Redirect them to the /login page, but save the current location they were
     // trying to go to when they were redirected. This allows us to send them
     // along to that page after they login, which is a nicer user experience
@@ -91,6 +108,8 @@ function RequireAuth({ children }: { children: JSX.Element }) {
 function RequireNoAuth({ children }: { children: JSX.Element }) {
   // let location = useLocation();
   const user = useAppSelector(currentuser);
+  console.log(user);
+  console.log("this is user in require no auth");
 
   if (user) {
     // Redirect them to the /login page, but save the current location they were
