@@ -82,6 +82,7 @@ export const extendedApi = apiSlice.injectEndpoints({
       query: () => ({
         url: "/auth/verify",
         method: "GET",
+        // refetchOnReconnect: true,
         // Include the entire post object as the body of the request
       }),
     }),

@@ -22,6 +22,7 @@ import {
   useSignUpMutation,
   useVerifyQuery,
 } from "../../features/api/endpoints/authEndpoints";
+import { Outlet } from "react-router-dom";
 
 type Props = {};
 
@@ -112,7 +113,7 @@ export const Login = (props: Props) => {
       console.log("we made it in signin func");
       // set requestStatus('idle')
       console.log(isSuccess);
-      navigate("/dashboard");
+      navigate("/");
     }
   };
 
@@ -293,6 +294,7 @@ export const Login = (props: Props) => {
         {/* <h1>Signout</h1> */}
         {/* <button onClick={SignoutFunc}>Signout</button> */}
       </div>
+      <Outlet />
     </div>
   );
 };

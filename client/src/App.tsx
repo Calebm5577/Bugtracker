@@ -1,5 +1,3 @@
-import React from "react";
-import logo from "./logo.svg";
 import { Counter } from "./features/counter/Counter";
 import { selectValue } from "./features/changetext/ChangetextSlice";
 import {
@@ -9,20 +7,16 @@ import {
 } from "./features/Auth/authSlice";
 import "./App.css";
 import { useAppSelector, useAppDispatch } from "./app/hooks";
-import {
-  goodbye,
-  addToSentance,
-  converse,
-} from "./features/changetext/ChangetextSlice";
 import { testLogin } from "./features/Auth/authSlice";
 import {
-  BrowserRouter as Router,
+  // BrowserRouter as Router,
   Routes,
   Route,
   redirect,
   useLocation,
   Navigate,
   useNavigate,
+  Outlet,
 } from "react-router-dom";
 import { FileWatcherEventKind } from "typescript";
 //pages
@@ -41,28 +35,8 @@ function App() {
 
   return (
     <>
-      <Router>
-        <Header />
-        <Routes>
-          <Route path="/" element={<Counter />} />
-          <Route
-            path="/login"
-            element={
-              <RequireNoAuth>
-                <Login />
-              </RequireNoAuth>
-            }
-          />
-          <Route
-            path="/dashboard"
-            element={
-              <RequireAuth>
-                <Dashboard />
-              </RequireAuth>
-            }
-          />
-        </Routes>
-      </Router>
+      <Header />
+      <Outlet />
     </>
   );
 }

@@ -5,6 +5,38 @@ import { store } from "./app/store";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import "./index.css";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { Login } from "./pages/Login/Login";
+import { Dashboard } from "./pages/Dashboard/Dashboard";
+import { ErrorPage } from "./pages/ErrorPage/ErrorPage";
+import { AuthLoader } from "./routing/loaders/AuthLoader";
+
+// //require Auth
+// const requireAuth = () => {
+//   const isAuthenticated = store.getState().commonData.isAuthenticaticated;
+//   if (isAuthenticated) return true;
+//   console.error("No auth, redirect to /auth");
+//   throw redirect("/auth");
+// };
+// react router dom
+const router = createBrowserRouter([
+  {
+    // path: "/",
+    element: <App />,
+    errorElement: <ErrorPage />,
+    // loader: AuthLoader,
+    children: [
+      {
+        path: "/",
+        element: <Dashboard />,
+      },
+    ],
+  },
+  {
+    path: "/login",
+    element: <Login />,
+  },
+]);
 
 const container = document.getElementById("root")!;
 const root = createRoot(container);
@@ -12,7 +44,8 @@ const root = createRoot(container);
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <App />
+      {/* <App /> */}
+      <RouterProvider router={router} />
     </Provider>
   </React.StrictMode>
 );
