@@ -10,10 +10,15 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const user = require("./models/user");
 const errorHandler = require("./middleware/error/errorMiddleware");
+
+//
+mongoose.set("strictQuery", true);
+mongoose.connect(process.env.MONGOURI);
 // import err
 //file imports
 const test = require("./routes/test");
 const auth = require("./routes/auth");
+const userData = require("./routes/userData");
 
 // const { Request, Response, NextFunction } = require("express");
 
@@ -32,13 +37,11 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use("/api/test", test);
 app.use("/api/auth", auth);
+app.use("/api/userData", userData);
 
 //error handler last middleware
 app.use(errorHandler);
 // app.use("/api/auth", require("./routes/auth"));
-
-mongoose.set("strictQuery", true);
-mongoose.connect(process.env.MONGOURI);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);

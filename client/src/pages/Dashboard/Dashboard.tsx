@@ -5,9 +5,10 @@ import {
   useVerifyQuery,
 } from "../../features/api/endpoints/authEndpoints";
 import { extendedApi } from "../../features/api/endpoints/authEndpoints";
-import { currentuser } from "../../features/Auth/authSlice";
+import { currentuser, updateUser } from "../../features/Auth/authSlice";
 import { useAppSelector, useAppDispatch } from "../../app/hooks";
 import { Navigate, useNavigate } from "react-router-dom";
+//
 
 // jsx stuff
 import { SideBar } from "./DashboardComponents/SideBar/SideBar";
@@ -37,7 +38,7 @@ export const Dashboard = () => {
   // and no refresh, ie getting redirected and immediatley signing in will work
   // but you wont redirect like you are supposed too , thus added !user
 
-  if (loginError && loginIsError) {
+  if (loginError && loginIsError && !user) {
     //alert toasties
     console.log("right before error");
     return <Navigate to="/login" />;
@@ -46,6 +47,8 @@ export const Dashboard = () => {
   if (loginSuccess && loginData) {
     console.log("user is logged in");
     //dispatch(loginData)
+    console.log(loginData);
+    // dispatch(updateUser())
   }
 
   /// continue if is logged in
