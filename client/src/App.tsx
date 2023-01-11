@@ -24,6 +24,7 @@ import { Login } from "./pages/Login/Login";
 import { Dashboard } from "./pages/Dashboard/Dashboard";
 import { Header } from "./components/Header";
 import { useVerifyQuery } from "./features/api/endpoints/authEndpoints";
+import React from "react";
 
 function App() {
   // hello value from state
