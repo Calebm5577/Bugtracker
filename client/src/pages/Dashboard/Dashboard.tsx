@@ -8,12 +8,14 @@ import { extendedApi } from "../../features/api/endpoints/authEndpoints";
 import { currentuser, updateUser } from "../../features/Auth/authSlice";
 import { useAppSelector, useAppDispatch } from "../../app/hooks";
 import { Navigate, useNavigate } from "react-router-dom";
+
 //
 
 // jsx stuff
 import { SideBar } from "./DashboardComponents/SideBar/SideBar";
 
 export const Dashboard = () => {
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const user = useAppSelector(currentuser);
   const [trigger, { isLoading, isError, data, error }] =
@@ -48,7 +50,7 @@ export const Dashboard = () => {
     console.log("user is logged in");
     //dispatch(loginData)
     console.log(loginData);
-    // dispatch(updateUser())
+    dispatch(updateUser(loginData));
   }
 
   /// continue if is logged in

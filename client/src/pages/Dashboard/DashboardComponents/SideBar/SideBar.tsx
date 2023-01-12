@@ -3,12 +3,28 @@ import { useCreateWorkspaceMutation } from "../../../../features/api/endpoints/s
 // import  HiPlus  from "react-icons/fa";
 import { currentuser, updateUser } from "../../../../features/Auth/authSlice";
 import { useAppSelector, useAppDispatch } from "../../../../app/hooks";
+import { useGetWorkspaceQuery } from "../../../../features/api/endpoints/sideBarEndpoints";
+import { servers } from "../../../../features/SideBar/SideBar";
+import { useState } from "react";
 
-export function SideBar() {
+export function SideBar(): JSX.Element {
   const user = useAppSelector(currentuser);
+  const userServers = useAppSelector(servers);
+  const [isModal, setIsModal] = useState(false);
   const [createWorkspace, { isError, isLoading, isSuccess, data }] =
     useCreateWorkspaceMutation();
 
+  const {
+    isError: GetWorkspaceIsError,
+    isLoading: GetWorkspaceIsLoading,
+    isSuccess: GetWorkspaceIsSuccess,
+    error: GetWorkspaceError,
+  } = useGetWorkspaceQuery("");
+
+  //function to handle popup modal
+  // const change = () => {};
+
+  // function to create workspace
   const createWorkspaceFunc = async () => {
     try {
       let newWorkspace = await createWorkspace({
@@ -34,6 +50,23 @@ export function SideBar() {
     console.log("is error");
   }
 
+  if (GetWorkspaceIsLoading) {
+    console.log("GetWorkspace is loading");
+  }
+
+  if (GetWorkspaceIsSuccess) {
+    console.log("GetWorkspace is success");
+  }
+
+  if (GetWorkspaceIsError) {
+    console.log(" GetWorkspace is error");
+  }
+
+  if (GetWorkspaceError) {
+    console.log(" GetWorkspace error");
+    console.log(GetWorkspaceError);
+  }
+
   return (
     <div
       style={{
@@ -55,12 +88,18 @@ export function SideBar() {
           alignItems: "center",
           borderRadius: "50%",
         }}
-        onClick={createWorkspaceFunc}
+        onClick={() => setIsModal(true)}
       >
-        {/* <div style={{ color: "green", fontSize: "48px" }}>+</div>
-         */}
         click
       </button>
+      {isModal ? (
+        <div style={{ position: "absolute", background: "#ffffff" }}>
+          <h1>Modal</h1>
+          <button onClick={() => setIsModal(false)}>close</button>
+        </div>
+      ) : (
+        ""
+      )}
       <div
         style={{
           border: "1px solid blue",
@@ -68,6 +107,17 @@ export function SideBar() {
         }}
       >
         WORKSPACES
+        {/* {console.log("user servers")} */}
+        {userServers?.map((element: any, id) => {
+          console.log("element");
+          console.log(element);
+          return (
+            <div key={id}>
+              <p>{element.name}</p>
+              <p>{element.workspace}</p>
+            </div>
+          );
+        })}
       </div>
 
       <div

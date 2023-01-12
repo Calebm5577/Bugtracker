@@ -4,12 +4,15 @@ import changetext from "../features/changetext/ChangetextSlice";
 import authSlice from "../features/Auth/authSlice";
 import { apiSlice } from "../features/api/apiSlice";
 import { rtkQueryErrorLogger } from "../middleware/errorMiddleware";
+import sideBarSlice from "../features/SideBar/SideBar";
 
 export const store = configureStore({
   reducer: {
     counter: counterReducer,
     changetext: changetext,
+    sidebar: sideBarSlice,
     auth: authSlice,
+
     [apiSlice.reducerPath]: apiSlice.reducer,
   },
   middleware: (getDefaultMiddleware) =>

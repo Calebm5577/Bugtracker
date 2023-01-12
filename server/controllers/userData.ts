@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 // const { User } = require("../models/user");
 const Workspace = require("../models/workspace");
-const { Members } = require("../models/members");
+const Members = require("../models/members");
 const asyncHandler = require("express-async-handler");
 // const { Notifications } = require("../models/notifications");
 
@@ -22,18 +22,25 @@ const test = async (req: Request | any, res: Response) => {
 const createWorkspace = asyncHandler(
   async (req: Request | any, res: Response) => {
     console.log("made it to createWorkspace");
-    console.log(req.body.sentObj.name);
+    // console.log(req.body.sentObj.name);
+    console.log(req.userDecoded);
+    // console.log(req.headers);
     try {
       let newWorkspace = await Workspace.create({
         name: req.body.sentObj.name,
-        createdBy: req.body.sentObj.user,
+        createdBy: req.userDecoded._id,
         // createdAt : '' defaults to now
       });
 
-      // let updateWorkspaceMembers = await Members.create({
-      //   workspace: newWorkspace.id,
-      //   user: "someone",
-      // });
+      let updateWorkspaceMembers = await Members.create({
+        name: newWorkspace.name,
+        workspace: newWorkspace.id,
+        user: req.userDecoded._id,
+      });
+      console.log("new workspace");
+      console.log(newWorkspace);
+      console.log("update workspace members");
+      console.log(updateWorkspaceMembers);
 
       res.status(200).json({ message: `successfully created workspace ` });
     } catch (e) {
@@ -47,19 +54,31 @@ const createWorkspace = asyncHandler(
 );
 
 const getWorkspaces = async (req: Request | any, res: Response) => {
-  // res.send("Hello World!");
+  // res.status(200).json({ message: "success" });
   // throw new Error("BROKEN");
-  //   try {
-  //     let getMyWorkspaces = await Members.find({
-  //       user: "someone",
-  //       // createdAt : '' defaults to now
-  //     });
-  //     res.status(200).json({ message: `successfully created workspace ` });
-  //   } catch (e) {
-  //     res.status(400);
-  //     throw new Error("soemthing went wrong in catch");
-  //     //
-  //   }
+  console.log(req.userDecoded);
+
+  try {
+    let getMyWorkspaces = await Members.find({
+      user: req.userDecoded._id,
+      // createdAt : '' defaults to now
+    });
+    console.log("gotten workspaces");
+    console.log(getMyWorkspaces);
+    // console.log("getMyWorkspaces");
+    // console.log(getMyWorkspaces);
+    //const { password, ...user } = checkuser._doc;
+
+    res.status(200).json({
+      message: `successfully got workspaces `,
+      servers: getMyWorkspaces,
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(400);
+    throw new Error("soemthing went wrong in catch");
+    //
+  }
   //   console.log("inside test");
   //   console.log(req.userDecoded);
   //   console.log("after req.userDecoded");

@@ -29,18 +29,16 @@ const signin = asyncHandler(async (req: Request, res: Response) => {
 
   if (checkuser) {
     try {
-      console.log(req.body.password);
-      console.log(checkuser);
-      let checkPassword = await bcrypt.compareSync(
-        req.body.password,
-        checkuser.password
-      );
+      const { password, ...user } = checkuser._doc;
+
+      let checkPassword = await bcrypt.compareSync(req.body.password, password);
       console.log("made it past let checkpassword");
 
       if (checkPassword) {
         console.log("made it inside checkpassword");
-        let AccessToken = generateAccessToken(checkPassword._id);
-        let RefreshToken = generateRefreshToken(checkPassword._id);
+
+        let AccessToken = generateAccessToken(user);
+        let RefreshToken = generateRefreshToken(user);
 
         res.cookie("auth-token", AccessToken, {
           httpOnly: false,
@@ -196,13 +194,13 @@ const verify = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const generateRefreshToken = (id: id) => {
-  return jwt.sign({ id }, process.env.REFRESH_JWT_SECRET, {
+  return jwt.sign({ ...id }, process.env.REFRESH_JWT_SECRET, {
     expiresIn: "30m",
   });
 };
 
 const generateAccessToken = (id: id) => {
-  return jwt.sign({ id }, process.env.ACCESS_JWT_SECRET, {
+  return jwt.sign({ ...id }, process.env.ACCESS_JWT_SECRET, {
     expiresIn: "3d",
   });
 };

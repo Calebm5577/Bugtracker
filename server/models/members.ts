@@ -4,6 +4,10 @@ const { Workspace } = require("./workspace");
 const { User } = require("./user");
 
 const membersSchema = new Schema({
+  name: {
+    type: String,
+    required: true,
+  },
   workspace: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Workspace",
