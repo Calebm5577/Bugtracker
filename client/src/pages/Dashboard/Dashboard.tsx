@@ -7,7 +7,7 @@ import {
 import { extendedApi } from "../../features/api/endpoints/authEndpoints";
 import { currentuser, updateUser } from "../../features/Auth/authSlice";
 import { useAppSelector, useAppDispatch } from "../../app/hooks";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate, Outlet, useNavigate } from "react-router-dom";
 
 //
 
@@ -95,6 +95,7 @@ export const Dashboard = () => {
         </button> */}
         <div>
           <p>the is the user: {user ? user : "none"}</p>
+          <Outlet />
         </div>
       </div>
     </div>

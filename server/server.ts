@@ -19,6 +19,7 @@ mongoose.connect(process.env.MONGOURI);
 const test = require("./routes/test");
 const auth = require("./routes/auth");
 const userData = require("./routes/userData");
+const workspaceData = require("./routes/workspaceData");
 
 // const { Request, Response, NextFunction } = require("express");
 
@@ -38,6 +39,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use("/api/test", test);
 app.use("/api/auth", auth);
 app.use("/api/userData", userData);
+app.use("/api/workspaceData", workspaceData);
 
 //error handler last middleware
 app.use(errorHandler);

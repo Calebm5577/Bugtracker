@@ -25,27 +25,6 @@ export const extendedApi = apiSlice.injectEndpoints({
         // Include the entire post object as the body of the request
         body: { sentObj },
       }),
-      //   transformResponse: (responseData: authObject) => {
-      //     console.log("transform in signin");
-      //     console.log(responseData);
-
-      //     let token = responseData.RefreshToken
-      //       ? responseData.RefreshToken
-      //       : null;
-
-      //     console.log("before token check");
-
-      //     if (token) {
-      //       console.log("gonna set session storage now!");
-      //       sessionStorage.setItem(
-      //         "user",
-      //         JSON.stringify(token.replace('"', ""))
-      //       );
-      //     }
-      //     console.log(`response data from authEndpoint ${responseData}`);
-      //     console.log(`${responseData.RefreshToken}`);
-      //     return responseData;
-      //   },
     }),
     getWorkspace: builder.query({
       query: () => ({

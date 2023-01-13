@@ -21,6 +21,10 @@ const test = async (req: Request | any, res: Response) => {
 //update workspaces, and members
 const createWorkspace = asyncHandler(
   async (req: Request | any, res: Response) => {
+    if (!req.body.sentObj.name) {
+      res.status(400);
+      throw new Error("need to include server name on create server");
+    }
     console.log("made it to createWorkspace");
     // console.log(req.body.sentObj.name);
     console.log(req.userDecoded);

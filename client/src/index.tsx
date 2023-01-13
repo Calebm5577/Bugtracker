@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Children } from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { store } from "./app/store";
@@ -10,6 +10,7 @@ import { Login } from "./pages/Login/Login";
 import { Dashboard } from "./pages/Dashboard/Dashboard";
 import { ErrorPage } from "./pages/ErrorPage/ErrorPage";
 import { AuthLoader } from "./routing/loaders/AuthLoader";
+import { Server } from "./pages/Server/Server";
 
 // //require Auth
 // const requireAuth = () => {
@@ -29,6 +30,12 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <Dashboard />,
+        children: [
+          {
+            path: "server",
+            element: <Server />,
+          },
+        ],
       },
     ],
   },

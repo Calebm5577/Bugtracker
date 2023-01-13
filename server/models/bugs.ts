@@ -1,39 +1,38 @@
 import mongoose from "mongoose";
 const { Schema } = mongoose;
 const { Workspace } = require("./workspace");
-const { User } = require("./user");
+// const { User } = require("./user");
+// const { BugBoard } = require("./bugboard");
 
-const userSchema = new Schema({
-  workspace: {
-    type: Workspace,
-    required: true,
-  },
+const bugSchema = new Schema({
   createdBy: {
-    type: User,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
     required: true,
   },
-  bug: {
-    title: {
-      type: String,
-      required: true,
-    },
-    description: {
-      type: String,
-      required: true,
-    },
-    urgency: {
-      type: String,
-      required: true,
-    },
-    status: {
-      type: String,
-      required: true,
-    },
+  title: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+  urgency: {
+    type: String,
+    required: true,
+    default: "critical",
+  },
+  status: {
+    type: String,
+    required: true,
+    default: "idle",
   },
   assigned: {
-    type: User,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
     required: false,
   },
 });
 
-module.exports = mongoose.model("User", userSchema);
+module.exports = mongoose.model("Bug", bugSchema);
