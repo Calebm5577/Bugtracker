@@ -84,22 +84,22 @@ export function Server() {
 
   console.log("hello inside server");
   if (isError) {
-    console.log("success in isError.tsx");
+    console.log("get bugs success in isError.tsx");
     console.log(isError);
   }
 
   if (isLoading) {
-    console.log("success in isLoading.tsx");
+    console.log("get bugs success in isLoading.tsx");
     console.log(isLoading);
   }
 
   if (isSuccess) {
-    console.log("success in server.tsx");
+    console.log("get bugs success in server.tsx");
     console.log(isSuccess);
   }
 
   if (data) {
-    console.log("data success");
+    console.log("get bugs data success");
     console.log(data);
   }
   //
@@ -121,9 +121,13 @@ export function Server() {
     console.log(createBugBoardData);
   }
 
+  if (CreateBugData) {
+    console.log("create bug data");
+  }
+
   const createNewBug = async (workspaceParam: any) => {
     try {
-      await createBug(workspaceParam);
+      await createBug("63c00b0036f2f01d4ca0a859");
       //dispatch results here or in query endpoint
     } catch (e) {
       console.log("something went wrong");
@@ -171,7 +175,10 @@ export function Server() {
       />
       <div>
         Here are your boards:
-        {data?.servers.map((server: any) => {
+        <button onClick={() => createNewBug({ sentObj })}>
+          create new bug
+        </button>
+        {/* {data?.servers.map((server: any) => {
           let sentObj = {
             server: server.workspace,
             title: text.title,
@@ -200,7 +207,7 @@ export function Server() {
               />
             </div>
           );
-        })}
+        })} */}
       </div>
     </div>
   );
