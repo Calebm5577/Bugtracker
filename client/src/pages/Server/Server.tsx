@@ -3,6 +3,7 @@ import {
   useGetBugsQuery,
   useCreateBugBoardMutation,
   useCreateBugMutation,
+  useInviteWorkspaceMemberMutation,
 } from "../../features/api/endpoints/workspaceEndpoints";
 import {
   BrowserRouter as Router,
@@ -10,6 +11,10 @@ import {
   useLocation,
   Navigate,
 } from "react-router-dom";
+import {
+  useDeleteBugMutation,
+  useEditBugTitleMutation,
+} from "../../features/api/endpoints/editBugsEndpoints";
 
 function useQuery() {
   const { search } = useLocation();
@@ -31,6 +36,8 @@ export function Server() {
     boardName: "",
     title: "",
     description: "",
+    inviteUser: "",
+    newTitle: "",
   });
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -58,6 +65,17 @@ export function Server() {
 
   //create bug in a board
   const [
+    InviteWorkspaceMember,
+    {
+      isError: InviteWorkspaceMemberError,
+      isLoading: InviteWorkspaceMemberLoading,
+      isSuccess: InviteWorkspaceMemberSuccess,
+      data: InviteWorkspaceMemberData,
+    },
+  ] = useInviteWorkspaceMemberMutation();
+
+  //invite memeber to worksapce
+  const [
     createBugBoard,
     {
       isError: createBugBoardError,
@@ -66,6 +84,29 @@ export function Server() {
       data: createBugBoardData,
     },
   ] = useCreateBugBoardMutation();
+
+  // delete bug in workspace
+  const [
+    DeleteBug,
+    {
+      isError: DeleteBugError,
+      isLoading: DeleteBugLoading,
+      isSuccess: DeleteBugSuccess,
+      data: DeleteBugData,
+    },
+  ] = useDeleteBugMutation();
+
+  //edit bug title
+
+  const [
+    EditBugTitle,
+    {
+      isError: EditBugTitleError,
+      isLoading: EditBugTitleLoading,
+      isSuccess: EditBugTitleSuccess,
+      data: EditBugTitleData,
+    },
+  ] = useEditBugTitleMutation();
 
   //
   let sentObj = {
@@ -125,9 +166,31 @@ export function Server() {
     console.log("create bug data");
   }
 
+  ///delete loadings:
+
+  if (DeleteBugError) {
+    console.log("success in DeleteBugError.tsx");
+    console.log(DeleteBugError);
+  }
+
+  if (DeleteBugLoading) {
+    console.log("success in DeleteBugLoading.tsx");
+    console.log(DeleteBugError);
+  }
+
+  if (DeleteBugSuccess && DeleteBugData) {
+    console.log("success DeleteBugSuccess.tsx");
+    console.log(DeleteBugError);
+    console.log(DeleteBugData);
+  }
+
+  if (CreateBugData) {
+    console.log("create bug data");
+  }
+
   const createNewBug = async (workspaceParam: any) => {
     try {
-      await createBug("63c00b0036f2f01d4ca0a859");
+      await createBug(workspaceParam);
       //dispatch results here or in query endpoint
     } catch (e) {
       console.log("something went wrong");
@@ -150,6 +213,57 @@ export function Server() {
     }
   };
 
+  const inviteToWorkspaceFunc = async () => {
+    let sentObj = {
+      user: text.inviteUser,
+      workspace: server,
+    };
+    try {
+      let req = await InviteWorkspaceMember({ sentObj });
+      console.log(req);
+    } catch (e) {
+      console.log("errror thrown in inviteToWorkspaceFunc");
+      console.log(e);
+    }
+  };
+
+  //delete bug func
+
+  const deleteBugFunc = async (workspace: string, bug: string) => {
+    let sentObj = {
+      workspace,
+      bug,
+    };
+
+    try {
+      let req = await DeleteBug({ sentObj });
+    } catch (e) {
+      console.log("error something");
+      console.log(e);
+    }
+  };
+
+  //edit bugTitleFunc
+
+  const editBugTitleFunc = async (
+    board: string,
+    bug: string,
+    method: string
+  ) => {
+    let sentObj = {
+      board,
+      bug,
+      data: text.newTitle,
+      method,
+    };
+    try {
+      let req = await EditBugTitle({ sentObj });
+    } catch (e) {
+      console.log("error something in editBugTitle catch");
+      console.log(e);
+    }
+  };
+
   //get server information here
   return (
     <div
@@ -159,10 +273,23 @@ export function Server() {
         flexDirection: "column",
       }}
     >
-      THIS IS THE SERVER PAGE OF SERVER:{" "}
+      THIS IS THE SERVER PAGE OF SERVER:
       <span style={{ backgroundColor: "red", maxWidth: "250px" }}>
         {server}
       </span>
+      <br />
+      <div>
+        <h1>Invite another user to this server</h1>
+        <input
+          placeholder="user's email"
+          value={text.inviteUser}
+          onChange={handleChange}
+          name="inviteUser"
+        />
+        <button onClick={inviteToWorkspaceFunc}>Invite user</button>
+      </div>
+      <br />
+      <br />
       <button style={{ maxWidth: "150px" }} onClick={createNewBugBoardFunc}>
         Create New Board
       </button>
@@ -175,19 +302,111 @@ export function Server() {
       />
       <div>
         Here are your boards:
-        <button onClick={() => createNewBug({ sentObj })}>
+        {/* <button onClick={() => createNewBug({ sentObj })}>
           create new bug
-        </button>
-        {/* {data?.servers.map((server: any) => {
+        </button> */}
+        <h1>MY BUG BOARDS</h1>;
+        {data?.boards.map((board: any, index1: number) => {
           let sentObj = {
-            server: server.workspace,
+            board: board._id,
             title: text.title,
             description: text.description,
           };
+
           return (
-            <div>
-              <p>{server.name}</p>
-              <p>{server.workspace}</p>
+            <div key={index1}>
+              <p>{board.name}</p>
+              <p>{board.workspace}</p>
+              <div>
+                <h1>Bugs in {board.name}</h1>
+                {board?.bugs?.map((bug: any, index2: number) => {
+                  return (
+                    <div
+                      key={index2}
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-around",
+                        width: "80vw",
+                      }}
+                    >
+                      {/* <p>A bug</p> */}
+                      <div>
+                        <button
+                          onClick={() =>
+                            editBugTitleFunc(board._id, bug._id, "title")
+                          }
+                        >
+                          Edit Title
+                        </button>
+                        <input
+                          placeholder="edit title"
+                          value={text.newTitle}
+                          onChange={handleChange}
+                          name="newTitle"
+                        />
+                        <p>{bug.title}</p>
+                      </div>
+
+                      <div>
+                        <button
+                          onClick={() =>
+                            editBugTitleFunc(board._id, bug._id, "description")
+                          }
+                        >
+                          Edit Title
+                        </button>
+                        <input
+                          placeholder="edit title"
+                          value={text.newTitle}
+                          onChange={handleChange}
+                          name="newTitle"
+                        />
+                        <p>{bug.description}</p>
+                      </div>
+
+                      <div>
+                        <button
+                          onClick={() =>
+                            editBugTitleFunc(board._id, bug._id, "status")
+                          }
+                        >
+                          Edit Status
+                        </button>
+                        <input
+                          placeholder="edit status"
+                          value={text.newTitle}
+                          onChange={handleChange}
+                          name="newTitle"
+                        />
+                        <p>{bug.status}</p>
+                      </div>
+
+                      <div>
+                        <button
+                          onClick={() =>
+                            editBugTitleFunc(board._id, bug._id, "urgency")
+                          }
+                        >
+                          Edit Urgency
+                        </button>
+                        <input
+                          placeholder="edit urgency"
+                          value={text.newTitle}
+                          onChange={handleChange}
+                          name="newTitle"
+                        />
+                        <p>{bug.urgency}</p>
+                      </div>
+
+                      <p>{bug.assigned ? bug.assigned : "unassigned"}</p>
+                      <p>{bug.assigned ? bug.assigned : "assigned by"}</p>
+                      <button onClick={() => deleteBugFunc(board._id, bug._id)}>
+                        Delete bug
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
               <button onClick={() => createNewBug({ sentObj })}>
                 Create New Bug
               </button>
@@ -207,7 +426,7 @@ export function Server() {
               />
             </div>
           );
-        })} */}
+        })}
       </div>
     </div>
   );

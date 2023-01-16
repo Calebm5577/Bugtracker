@@ -84,8 +84,8 @@ const signup = asyncHandler(
           password: hash,
         });
         console.log("step two");
-        let AccessToken = generateAccessToken(newUser._id);
-        let RefreshToken = generateRefreshToken(newUser._id);
+        let AccessToken = generateAccessToken(newUser);
+        let RefreshToken = generateRefreshToken(newUser);
         if (newUser) {
           res.cookie("auth-token", AccessToken, {
             httpOnly: false,

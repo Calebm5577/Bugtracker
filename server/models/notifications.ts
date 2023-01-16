@@ -6,18 +6,21 @@ const { User } = require("./user");
 
 const notificationsSchema = new Schema({
   workspace: {
-    type: Workspace,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Workspace",
     required: true,
   },
   sentBy: {
-    type: User,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
     required: true,
   },
   sentTo: {
-    type: User,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
     required: true,
   },
-  status: String,
+  // status: String,
 });
 
 module.exports = mongoose.model("Notifications", notificationsSchema);

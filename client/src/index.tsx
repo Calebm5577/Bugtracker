@@ -11,6 +11,7 @@ import { Dashboard } from "./pages/Dashboard/Dashboard";
 import { ErrorPage } from "./pages/ErrorPage/ErrorPage";
 import { AuthLoader } from "./routing/loaders/AuthLoader";
 import { Server } from "./pages/Server/Server";
+import { Home } from "./pages/Home/Home";
 
 // //require Auth
 // const requireAuth = () => {
@@ -34,6 +35,10 @@ const router = createBrowserRouter([
           {
             path: "server",
             element: <Server />,
+          },
+          {
+            path: "home",
+            element: <Home />,
           },
         ],
       },

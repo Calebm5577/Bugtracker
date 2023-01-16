@@ -8,6 +8,14 @@ import { servers } from "../../../../features/SideBar/SideBar";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
+/*
+PROBLEMS
+
+Originally dispatched data to server and then used servers sidebarSlice
+to render, switched back to just data, so is messy files rn
+
+*/
+
 export function SideBar(): JSX.Element {
   const user = useAppSelector(currentuser);
   const userServers = useAppSelector(servers);
@@ -26,6 +34,7 @@ export function SideBar(): JSX.Element {
     isLoading: GetWorkspaceIsLoading,
     isSuccess: GetWorkspaceIsSuccess,
     error: GetWorkspaceError,
+    data: GetWorkspaceData,
     refetch,
   } = useGetWorkspaceQuery("");
 
@@ -77,6 +86,11 @@ export function SideBar(): JSX.Element {
     console.log(GetWorkspaceError);
   }
 
+  if (GetWorkspaceData) {
+    console.log(" GetWorkspace data");
+    console.log(GetWorkspaceData);
+  }
+
   return (
     <div
       style={{
@@ -116,6 +130,19 @@ export function SideBar(): JSX.Element {
       ) : (
         ""
       )} */}
+      <Link to={`/home`}>
+        <div
+          style={{
+            border: "1px solid blue",
+            borderRadius: "50%",
+            marginTop: "25px",
+            textAlign: "center",
+          }}
+        >
+          <p>Home</p>
+          {/* <p>{element.workspace}</p> */}
+        </div>
+      </Link>
       <div
         style={{
           border: "1px solid blue",
@@ -124,13 +151,12 @@ export function SideBar(): JSX.Element {
       >
         WORKSPACES
         {/* {console.log("user servers")} */}
-        {userServers?.map((element: any, id) => {
+        {GetWorkspaceData?.servers?.map((element: any, id: number) => {
           console.log("element");
           console.log(element);
           return (
-            <Link to={`/server?name=${element.workspace}`}>
+            <Link to={`/server?name=${element.workspace}`} key={id}>
               <div
-                key={id}
                 style={{
                   border: "1px solid blue",
                   borderRadius: "50%",

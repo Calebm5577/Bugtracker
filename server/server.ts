@@ -20,6 +20,7 @@ const test = require("./routes/test");
 const auth = require("./routes/auth");
 const userData = require("./routes/userData");
 const workspaceData = require("./routes/workspaceData");
+const editBugs = require("./routes/editBugs");
 
 // const { Request, Response, NextFunction } = require("express");
 
@@ -40,6 +41,7 @@ app.use("/api/test", test);
 app.use("/api/auth", auth);
 app.use("/api/userData", userData);
 app.use("/api/workspaceData", workspaceData);
+app.use("/api/editBugs", editBugs);
 
 //error handler last middleware
 app.use(errorHandler);

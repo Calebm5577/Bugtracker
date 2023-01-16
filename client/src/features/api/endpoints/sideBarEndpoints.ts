@@ -2,11 +2,9 @@ import { apiSlice } from "../apiSlice";
 import { store } from "../../../app/store";
 import { sideBarSlice, updateUserServers } from "../../SideBar/SideBar";
 
-// directly importing the store to get current user as its used in every request
-// not sure if better way to handle this
-// const user = "user";
-
-// console.log(`user inside sidebarenpoints ${user}`);
+// inside sideBarEndPoints also contains endpoints for the home page
+// such as getting assigned taks from all workspaces
+// and notificatons for the user
 
 interface workspaceObj {
   name: string;
@@ -55,6 +53,21 @@ export const extendedApi = apiSlice.injectEndpoints({
         // Include the entire post object as the body of the request
       }),
     }),
+
+    getNotifications: builder.query({
+      query: () => ({
+        url: "/userData/getNotifications",
+        method: "GET",
+      }),
+    }),
+
+    acceptOrDenyNotificatons: builder.mutation({
+      query: (authObject) => ({
+        url: "/userData/acceptOrDenyNotificatons",
+        method: "POST",
+        body: { authObject },
+      }),
+    }),
   }),
   overrideExisting: false,
 });
@@ -63,4 +76,6 @@ export const {
   useCreateWorkspaceMutation,
   useSignOutQuery,
   useGetWorkspaceQuery,
+  useGetNotificationsQuery,
+  useAcceptOrDenyNotificatonsMutation,
 } = extendedApi;

@@ -7,6 +7,8 @@ const Members = require("../models/members");
 const asyncHandler = require("express-async-handler");
 const BugBoard = require("../models/bugboard");
 const Bug = require("../models/bugs");
+const User = require("../models/user");
+const Notification = require("../models/notifications");
 
 // const { Notifications } = require("../models/notifications");
 
@@ -47,19 +49,22 @@ const createBug = async (req: Request | any, res: Response) => {
   console.log("req body");
   console.log("hello inside createBug");
   //switch to req.body.sentObj.name
-  console.log(req.body);
+  console.log(req.body.sentObj.board);
+  console.log(req.body.sentObj.title);
+  console.log(req.body.sentObj.description);
+
   //   res.status(200).json({ message: "successfully connected to create bug" });
 
   try {
     let addBugToBugBoard = await BugBoard.findOneAndUpdate(
       {
-        _id: "63c1da50e192d9f3c480d360",
+        _id: req.body.sentObj.board,
       },
       {
         $push: {
           bugs: {
-            title: "bug title 1",
-            description: "bug description 1",
+            title: req.body.sentObj.title,
+            description: req.body.sentObj.description,
             createdBy: req.userDecoded._id,
           },
         },
@@ -77,18 +82,82 @@ const createBug = async (req: Request | any, res: Response) => {
     res.status(400);
     throw new Error("soemthing went wrong in catch");
   }
+  // res.status(200).json({ message: "success inside createbug" });
 };
 
 const getBugs = asyncHandler(async (req: Request | any, res: Response) => {
   // res.status(200).json({ message: "success" });
   // throw new Error("BROKEN");
   console.log("inside get bugs");
-  console.log(req.body.server);
-  res.status(200).json({ message: "success" });
+  console.log(req.body);
+
+  try {
+    let getBoards = await BugBoard.find({
+      workspace: req.body.server,
+    });
+
+    res.status(200).json({ message: "success", boards: getBoards });
+  } catch (e) {}
+  res.status(200).json({ message: "success from getBugs" });
 });
+
+const getWorkspaceMembers = asyncHandler(() => {});
+
+const inviteWorkspaceMember = asyncHandler(
+  async (req: Request | any, res: Response) => {
+    console.log(req.body.sentObj.user);
+    console.log(req.body.sentObj.workspace);
+
+    try {
+      // check user exitsts
+      let checkUserExists = await User.findOne({
+        email: req.body.sentObj.user,
+      });
+
+      //if user doesnt exist, throw error
+      if (!checkUserExists) {
+        res.status(401);
+        throw new Error("User does not exist");
+      }
+
+      //check user not already in workspace
+      let checkUserNotInWorkspace = await Members.findOne({
+        user: checkUserExists._id,
+        Workspace: req.body.sentObj.workspace,
+      });
+
+      // if user already in workspace, send error
+      if (checkUserNotInWorkspace) {
+        res.status(401);
+        throw new Error("User already in workspace");
+      }
+
+      //create notification for user assuming all checks worked
+      let createNotification = await Notification.create({
+        workspace: req.body.sentObj.workspace,
+        sentBy: req.userDecoded._id,
+        sentTo: checkUserExists._id,
+      });
+
+      res.status(200).json({
+        message: "success from inside inviteWorkspaceMember",
+        notification: createNotification,
+      });
+    } catch (e) {
+      console.log(e);
+      res.status(400);
+      throw new Error(
+        "Something went wrong in catch in inviteworkspacememeber"
+      );
+    }
+  }
+);
+
+const deleteWorkspaceMember = asyncHandler(() => {});
 
 module.exports = {
   createBugBoard,
   createBug,
   getBugs,
+  inviteWorkspaceMember,
 };

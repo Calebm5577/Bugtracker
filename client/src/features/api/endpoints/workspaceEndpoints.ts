@@ -33,6 +33,15 @@ export const extendedApi = apiSlice.injectEndpoints({
         // Include the entire post object as the body of the request
       }),
     }),
+
+    inviteWorkspaceMember: builder.mutation({
+      query: (authObject) => ({
+        url: "/workspaceData/inviteWorkspaceMember",
+        method: "POST",
+        body: authObject,
+        // Include the entire post object as the body of the request
+      }),
+    }),
   }),
   overrideExisting: false,
 });
@@ -41,4 +50,5 @@ export const {
   useCreateBugBoardMutation,
   useCreateBugMutation,
   useGetBugsQuery,
+  useInviteWorkspaceMemberMutation,
 } = extendedApi;
